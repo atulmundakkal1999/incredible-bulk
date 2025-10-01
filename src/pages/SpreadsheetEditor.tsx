@@ -14,6 +14,7 @@ import {
   RefreshCw
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { AIChatInterface } from "@/components/spreadsheet/AIChatInterface";
 
 export default function SpreadsheetEditor() {
   const [selectedCells, setSelectedCells] = useState<string[]>([]);
@@ -43,9 +44,11 @@ export default function SpreadsheetEditor() {
   }));
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="border-b bg-background p-4">
+    <div className="flex h-full gap-4 p-4">
+      {/* Main Spreadsheet Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Toolbar */}
+        <div className="border-b bg-background p-4 rounded-t-lg border border-b-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button size="sm" variant="outline">
@@ -152,19 +155,27 @@ export default function SpreadsheetEditor() {
         </div>
       </div>
 
-      {/* Formula Bar */}
-      <div className="border-t bg-background p-2">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium w-16">Formula:</span>
-          <Input 
-            className="flex-1" 
-            placeholder="Enter formula or value..."
-            disabled={selectedCells.length === 0}
-          />
-          <Button size="sm" disabled={selectedCells.length === 0}>
-            Apply
-          </Button>
+        {/* Formula Bar */}
+        <div className="border-t bg-background p-2 rounded-b-lg border border-t-0">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium w-16">Formula:</span>
+            <Input 
+              className="flex-1" 
+              placeholder="Enter formula or value..."
+              disabled={selectedCells.length === 0}
+            />
+            <Button size="sm" disabled={selectedCells.length === 0}>
+              Apply
+            </Button>
+          </div>
         </div>
+      </div>
+
+      {/* AI Chat Interface */}
+      <div className="w-96 flex-shrink-0">
+        <AIChatInterface 
+          sheetContext={`${mockProducts.length} products loaded. Columns: ${columns.map(c => c.name).join(', ')}`}
+        />
       </div>
     </div>
   );
