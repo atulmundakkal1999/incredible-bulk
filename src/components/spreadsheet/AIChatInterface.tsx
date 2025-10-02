@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import {
+  Card,
+  TextField,
+  Button,
+  BlockStack,
+  Text,
+  Box,
+  InlineStack,
+  Icon,
+} from "@shopify/polaris";
+import { SendIcon, PersonIcon, MagicIcon } from "@shopify/polaris-icons";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   role: "user" | "assistant";
@@ -29,7 +34,6 @@ export function AIChatInterface({ sheetContext }: AIChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId] = useState(crypto.randomUUID());
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -74,11 +78,6 @@ export function AIChatInterface({ sheetContext }: AIChatInterfaceProps) {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Error sending message:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send message",
-        variant: "destructive",
-      });
 
       const errorMessage: Message = {
         role: "assistant",
@@ -99,82 +98,94 @@ export function AIChatInterface({ sheetContext }: AIChatInterfaceProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full">
-      <CardHeader className="border-b">
-        <CardTitle className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-primary" />
-          AI Assistant
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-0">
-        <ScrollArea ref={scrollRef} className="flex-1 p-4">
-          <div className="space-y-4">
+    <Card>
+      <BlockStack gap="400">
+        <InlineStack align="start" blockAlign="center" gap="200">
+          <Icon source={MagicIcon} tone="info" />
+          <Text as="h2" variant="headingMd">
+            AI Assistant
+          </Text>
+        </InlineStack>
+
+        {/* Messages Area */}
+        <div
+          ref={scrollRef}
+          style={{
+            minHeight: "500px",
+            maxHeight: "600px",
+            overflowY: "auto",
+            padding: "1rem",
+            backgroundColor: "var(--p-color-bg-surface-secondary)",
+            borderRadius: "var(--p-border-radius-200)",
+          }}
+        >
+          <BlockStack gap="300">
             {messages.map((message, index) => (
-              <div
+              <Box
                 key={index}
-                className={`flex gap-3 ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                padding="300"
+                background={message.role === "user" ? "bg-fill-brand" : "bg-surface"}
+                borderRadius="200"
               >
-                {message.role === "assistant" && (
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-4 w-4 text-primary" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </p>
-                </div>
-                {message.role === "user" && (
-                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                    <User className="h-4 w-4 text-primary-foreground" />
-                  </div>
-                )}
-              </div>
+                <InlineStack gap="200" blockAlign="start">
+                  <Icon 
+                    source={message.role === "user" ? PersonIcon : MagicIcon} 
+                    tone={message.role === "user" ? "base" : "info"}
+                  />
+                  <BlockStack gap="100">
+                    <Text
+                      as="p"
+                      variant="bodyMd"
+                    >
+                      {message.content}
+                    </Text>
+                    <Text as="span" variant="bodySm" tone="subdued">
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+              </Box>
             ))}
             {isLoading && (
-              <div className="flex gap-3 justify-start">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Bot className="h-4 w-4 text-primary" />
-                </div>
-                <div className="bg-muted rounded-lg p-3">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </div>
-              </div>
+              <Box padding="300" background="bg-surface" borderRadius="200">
+                <InlineStack gap="200" blockAlign="center">
+                  <Icon source={MagicIcon} tone="info" />
+                  <Text as="p" variant="bodyMd">
+                    Processing...
+                  </Text>
+                </InlineStack>
+              </Box>
             )}
-          </div>
-        </ScrollArea>
-        <div className="p-4 border-t">
-          <div className="flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me to sort, filter, or update your data..."
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button onClick={sendMessage} disabled={isLoading || !input.trim()}>
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Press Enter to send, Shift+Enter for new line
-          </p>
+          </BlockStack>
         </div>
-      </CardContent>
+
+        {/* Input Area */}
+        <BlockStack gap="200">
+          <div onKeyDown={handleKeyPress}>
+            <TextField
+              label=""
+              value={input}
+              onChange={(value) => setInput(value)}
+              placeholder="Ask me to sort, filter, or update your data..."
+              multiline={2}
+              autoComplete="off"
+              disabled={isLoading}
+            />
+          </div>
+          <Button
+            onClick={sendMessage}
+            disabled={!input.trim() || isLoading}
+            icon={SendIcon}
+            fullWidth
+            loading={isLoading}
+          >
+            Send
+          </Button>
+          <Text as="p" variant="bodySm" tone="subdued">
+            Press Enter to send, Shift+Enter for new line
+          </Text>
+        </BlockStack>
+      </BlockStack>
     </Card>
   );
 }
