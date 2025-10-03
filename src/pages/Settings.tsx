@@ -50,7 +50,7 @@ export default function Settings() {
     }
 
     // Note: Replace YOUR_SHOPIFY_CLIENT_ID with your actual Shopify app client ID
-    const shopifyClientId = "YOUR_SHOPIFY_CLIENT_ID";
+    const shopifyClientId = "Y6316819e5d1d98bcf5aa00b76937f62b";
     const redirectUri = `${window.location.origin}/auth/callback`;
     const scopes = "read_products,write_products,read_inventory,write_inventory";
     
