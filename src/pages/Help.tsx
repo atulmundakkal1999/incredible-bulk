@@ -14,7 +14,10 @@ import {
   Code,
   Database,
   Cpu,
-  Cloud
+  Cloud,
+  Zap,
+  Store,
+  AlertCircle
 } from "lucide-react";
 import {
   Accordion,
@@ -446,6 +449,135 @@ export default function Help() {
                       <li>Caching for frequently accessed data</li>
                       <li>Exponential backoff for rate limit management</li>
                       <li>CDN caching via Vercel infrastructure</li>
+                    </ul>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="shopify-integration">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Store className="h-4 w-4" />
+                  <span>Shopify Integration Guide</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                <div className="space-y-6">
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Prerequisites</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2">
+                      <li>Active Shopify store (free trial or paid plan)</li>
+                      <li>Shopify Partner account (free at <a href="https://partners.shopify.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">partners.shopify.com</a>)</li>
+                      <li>Admin access to your Shopify store</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Step 1: Create Shopify Partner Account</p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Visit <a href="https://partners.shopify.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">partners.shopify.com</a></li>
+                      <li>Click "Sign Up" and complete registration</li>
+                      <li>Verify your email address</li>
+                      <li>Complete your partner profile</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Step 2: Create App in Partner Dashboard</p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Log into Shopify Partner Dashboard</li>
+                      <li>Click "Apps" in the left sidebar</li>
+                      <li>Click "Create app" button</li>
+                      <li>Select app type (Custom or Public)</li>
+                      <li>Enter app name: "AI IncredibleBulk"</li>
+                      <li>Set App URL to your deployment URL</li>
+                      <li>Click "Create app"</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Step 3: Configure App Settings</p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Go to "Configuration" in app dashboard</li>
+                      <li>Set Allowed redirection URL: <code className="bg-muted px-2 py-1 rounded text-sm">https://your-domain.com/auth/callback</code></li>
+                      <li>Configure required API scopes:
+                        <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                          <li><code className="bg-muted px-2 py-1 rounded text-sm">read_products</code> - Read product data</li>
+                          <li><code className="bg-muted px-2 py-1 rounded text-sm">write_products</code> - Update products</li>
+                          <li><code className="bg-muted px-2 py-1 rounded text-sm">read_inventory</code> - Read inventory</li>
+                          <li><code className="bg-muted px-2 py-1 rounded text-sm">write_inventory</code> - Update inventory</li>
+                        </ul>
+                      </li>
+                      <li>Save your configuration</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Step 4: Get API Credentials</p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Find "API credentials" section</li>
+                      <li>Copy <strong>API key</strong> (Client ID)</li>
+                      <li>Copy <strong>API secret key</strong> (Client Secret)</li>
+                      <li>Store securely for configuration</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Step 5: Install App on Store</p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Go to AI IncredibleBulk Settings page</li>
+                      <li>Enter store domain (e.g., mystore.myshopify.com)</li>
+                      <li>Click "Connect" to start OAuth flow</li>
+                      <li>Authorize app on Shopify</li>
+                      <li>Review permissions and click "Install"</li>
+                      <li>Redirected back to AI IncredibleBulk</li>
+                      <li>Start managing products!</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Step 6: Verify Connection</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2">
+                      <li>Check "Connected" badge in Settings</li>
+                      <li>Verify store domain displays correctly</li>
+                      <li>Test product loading in Spreadsheet Editor</li>
+                      <li>Check API rate limit status</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                    <p className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      Troubleshooting
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+                      <li><strong>OAuth error:</strong> Verify redirect URL matches Partner Dashboard</li>
+                      <li><strong>Scope error:</strong> Enable all required API scopes</li>
+                      <li><strong>Connection fails:</strong> Check store domain format (.myshopify.com)</li>
+                      <li><strong>No products:</strong> Verify read_products scope enabled</li>
+                      <li><strong>Rate limit:</strong> Wait 60 seconds and retry</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <p className="font-semibold text-foreground mb-2">Security Best Practices</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+                      <li>Never share API secret key publicly</li>
+                      <li>Use HTTPS for all communications</li>
+                      <li>Review app permissions regularly</li>
+                      <li>Monitor API usage for anomalies</li>
+                      <li>Rotate credentials periodically</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground mb-2">Additional Resources</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2">
+                      <li><a href="https://shopify.dev/docs/apps/auth/oauth" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">Shopify OAuth Documentation <ExternalLink className="h-3 w-3" /></a></li>
+                      <li><a href="https://shopify.dev/docs/api/admin-rest" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">Admin API Reference <ExternalLink className="h-3 w-3" /></a></li>
+                      <li><a href="https://partners.shopify.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">Partner Dashboard <ExternalLink className="h-3 w-3" /></a></li>
+                      <li><a href="https://shopify.dev/docs/apps/best-practices/performance" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">API Best Practices <ExternalLink className="h-3 w-3" /></a></li>
                     </ul>
                   </div>
                 </div>

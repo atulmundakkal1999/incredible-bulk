@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,8 @@ import {
   AlertCircle,
   Bell,
   Database,
-  Shield
+  Shield,
+  ExternalLink
 } from "lucide-react";
 import {
   Select,
@@ -20,8 +22,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Settings() {
+  const { toast } = useToast();
+  const [isConnected, setIsConnected] = useState(false);
+  const [storeDomain, setStoreDomain] = useState("");
+
+  const handleConnectShopify = () => {
+    if (!storeDomain) {
+      toast({
+        title: "Store domain required",
+        description: "Please enter your Shopify store domain",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Shopify OAuth URL - in production, this would redirect to Shopify OAuth
+    const shopifyOAuthUrl = `https://${storeDomain}/admin/oauth/authorize?client_id=YOUR_CLIENT_ID&scope=read_products,write_products,read_inventory,write_inventory&redirect_uri=${window.location.origin}/auth/callback`;
+    
+    toast({
+      title: "Connecting to Shopify",
+      description: "Redirecting to Shopify authorization...",
+    });
+
+    // In production, redirect to Shopify OAuth
+    // window.location.href = shopifyOAuthUrl;
+    
+    // For demo purposes
+    setTimeout(() => {
+      setIsConnected(true);
+      toast({
+        title: "Store connected",
+        description: "Successfully connected to your Shopify store",
+      });
+    }, 1500);
+  };
+
+  const handleDisconnect = () => {
+    setIsConnected(false);
+    setStoreDomain("");
+    toast({
+      title: "Store disconnected",
+      description: "Your Shopify store has been disconnected",
+    });
+  };
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -40,47 +86,88 @@ export default function Settings() {
                 <Store className="h-5 w-5" />
                 Shopify Connection
               </CardTitle>
-              <CardDescription>Your store connection status and details</CardDescription>
+              <CardDescription>Connect your store to start managing products</CardDescription>
             </div>
-            <Badge variant="default" className="flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" />
-              Connected
-            </Badge>
+            {isConnected ? (
+              <Badge variant="default" className="flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                Connected
+              </Badge>
+            ) : (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                Not Connected
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Store Domain</Label>
-              <Input value="mystore.myshopify.com" disabled />
-            </div>
-            <div className="space-y-2">
-              <Label>Plan</Label>
-              <Input value="Shopify Plus" disabled />
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-            <div className="flex items-center gap-3">
-              <Database className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="font-medium">API Rate Limit</p>
+          {!isConnected ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="store-domain">Store Domain</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="store-domain"
+                    placeholder="mystore.myshopify.com"
+                    value={storeDomain}
+                    onChange={(e) => setStoreDomain(e.target.value)}
+                  />
+                  <Button onClick={handleConnectShopify}>
+                    Connect
+                  </Button>
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  Current usage: 234/1000 calls per minute
+                  Enter your Shopify store domain to connect
                 </p>
               </div>
-            </div>
-            <div className="text-sm text-success">Healthy</div>
-          </div>
+              
+              <div className="flex items-start gap-2 p-4 bg-muted rounded-lg">
+                <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Need help connecting?</p>
+                  <p className="text-sm text-muted-foreground">
+                    Check our <a href="/help" className="text-primary hover:underline">Help section</a> for detailed setup instructions
+                  </p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Store Domain</Label>
+                  <Input value={storeDomain || "mystore.myshopify.com"} disabled />
+                </div>
+                <div className="space-y-2">
+                  <Label>Plan</Label>
+                  <Input value="Shopify Plus" disabled />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Database className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium">API Rate Limit</p>
+                    <p className="text-sm text-muted-foreground">
+                      Current usage: 234/1000 calls per minute
+                    </p>
+                  </div>
+                </div>
+                <div className="text-sm text-green-600">Healthy</div>
+              </div>
 
-          <div className="flex gap-2">
-            <Button variant="outline">
-              Reconnect Store
-            </Button>
-            <Button variant="destructive">
-              Disconnect
-            </Button>
-          </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleConnectShopify}>
+                  Reconnect Store
+                </Button>
+                <Button variant="destructive" onClick={handleDisconnect}>
+                  Disconnect
+                </Button>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
