@@ -11,6 +11,7 @@ import History from "./pages/History";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
+import ShopifyCallback from "./pages/ShopifyCallback";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
               <Help />
             </AppLayout>
           } />
+          <Route path="/auth/callback" element={<ShopifyCallback />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -30,34 +30,39 @@ export default function Settings() {
   const [storeDomain, setStoreDomain] = useState("");
 
   const handleConnectShopify = () => {
-    if (!storeDomain) {
+    if (!storeDomain.trim()) {
       toast({
-        title: "Store domain required",
-        description: "Please enter your Shopify store domain",
+        title: "Error",
+        description: "Please enter your store domain",
         variant: "destructive",
       });
       return;
     }
 
-    // Shopify OAuth URL - in production, this would redirect to Shopify OAuth
-    const shopifyOAuthUrl = `https://${storeDomain}/admin/oauth/authorize?client_id=YOUR_CLIENT_ID&scope=read_products,write_products,read_inventory,write_inventory&redirect_uri=${window.location.origin}/auth/callback`;
+    // Basic domain validation
+    if (!storeDomain.includes('.myshopify.com')) {
+      toast({
+        title: "Invalid Domain",
+        description: "Please enter a valid Shopify store domain (e.g., your-store.myshopify.com)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Note: Replace YOUR_SHOPIFY_CLIENT_ID with your actual Shopify app client ID
+    const shopifyClientId = "YOUR_SHOPIFY_CLIENT_ID";
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    const scopes = "read_products,write_products,read_inventory,write_inventory";
+    
+    const authUrl = `https://${storeDomain}/admin/oauth/authorize?client_id=${shopifyClientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
     
     toast({
-      title: "Connecting to Shopify",
-      description: "Redirecting to Shopify authorization...",
+      title: "Redirecting to Shopify",
+      description: "You'll be redirected to authorize this app...",
     });
-
-    // In production, redirect to Shopify OAuth
-    // window.location.href = shopifyOAuthUrl;
     
-    // For demo purposes
-    setTimeout(() => {
-      setIsConnected(true);
-      toast({
-        title: "Store connected",
-        description: "Successfully connected to your Shopify store",
-      });
-    }, 1500);
+    // Redirect to Shopify OAuth
+    window.location.href = authUrl;
   };
 
   const handleDisconnect = () => {
